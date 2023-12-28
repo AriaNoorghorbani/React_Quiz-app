@@ -1,6 +1,7 @@
 import { useState } from "react";
 import QUESTIONS from "../questions";
 import completeImg from "../assets/quiz-complete.png";
+import ProgressBar from "./ProgressBar";
 
 export default function Quiz() {
   const [userAnswers, setUserAnswers] = useState([]);
@@ -28,6 +29,10 @@ export default function Quiz() {
   return (
     <div id="quiz">
       <div className="question">
+        <ProgressBar
+          timeout="15000"
+          onTimeout={() => handleSelectAnswer(null)}
+        />
         <h2>{QUESTIONS[activeQuestionIndex].text}</h2>
         <ul id="answers">
           {answerShuffled.map((answer) => (
