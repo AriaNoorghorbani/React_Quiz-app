@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import QUESTIONS from "../questions";
 import completeImg from "../assets/quiz-complete.png";
-import ProgressBar from "./ProgressBar";
+import QuestionTimer from "./QuestionTimer";
 
 export default function Quiz() {
   const [userAnswers, setUserAnswers] = useState([]);
@@ -10,9 +10,21 @@ export default function Quiz() {
 
   const questionIsComplete = activeQuestionIndex === QUESTIONS.length;
 
-  function handleSelectAnswer(selectedAnswer) {
+  //
+
+  const handleSelectAnswer = useCallback(function handleSelectAnswer(
+    selectedAnswer
+  ) {
     setUserAnswers((prevAnswer) => [...prevAnswer, selectedAnswer]);
-  }
+  },
+  []);
+
+  const handleSkipAnswer = useCallback(
+    () => handleSelectAnswer(null),
+    [handleSelectAnswer]
+  );
+
+  //
 
   if (questionIsComplete) {
     return (
@@ -29,17 +41,16 @@ export default function Quiz() {
   return (
     <div id="quiz">
       <div className="question">
-        <ProgressBar
-          timeout="15000"
-          onTimeout={() => handleSelectAnswer(null)}
+        <QuestionTimer
+          key={activeQuestionIndex}
+          timeout="10000"
+          onTimeout={handleSkipAnswer}
         />
         <h2>{QUESTIONS[activeQuestionIndex].text}</h2>
         <ul id="answers">
           {answerShuffled.map((answer) => (
             <li key={answer} className="answer">
-              <button onClick={() => handleSelectAnswer(answer)}>
-                {answer}
-              </button>
+              <button onClick={handleSkipAnswer}>{answer}</button>
             </li>
           ))}
         </ul>
