@@ -1,12 +1,12 @@
 import { useCallback, useRef, useState } from "react";
-import QUESTIONS from "../questions";
 import completeImg from "../assets/quiz-complete.png";
 import QuestionTimer from "./QuestionTimer";
+import Answers from "./Answers";
+import QUESTIONS from "../questions";
 
 export default function Quiz() {
   const [userAnswers, setUserAnswers] = useState([]);
   const [answerState, setAnswerState] = useState("");
-  const answerShuffled = useRef();
 
   const activeQuestionIndex =
     answerState === "" ? userAnswers.length : userAnswers.length - 1;
@@ -54,11 +54,6 @@ export default function Quiz() {
     );
   }
 
-  if (!answerShuffled.current) {
-    answerShuffled.current = QUESTIONS[activeQuestionIndex].answers;
-    answerShuffled.current.sort(() => Math.random() - 0.5);
-  }
-
   return (
     <div id="quiz">
       <div className="question">
@@ -68,34 +63,12 @@ export default function Quiz() {
           onTimeout={handleSkipAnswer}
         />
         <h2>{QUESTIONS[activeQuestionIndex].text}</h2>
-        <ul id="answers">
-          {answerShuffled.current.map((answer) => {
-            const isSelected = userAnswers[userAnswers.length - 1] === answer;
-            let setClass = "";
-
-            if (answerState === "answered" && isSelected) {
-              setClass = "selected";
-            }
-
-            if (
-              (answerState === "wrong" || answerState === "correct") &&
-              isSelected
-            ) {
-              setClass = answerState;
-            }
-
-            return (
-              <li key={answer} className="answer">
-                <button
-                  onClick={() => handleSelectAnswer(answer)}
-                  className={setClass}
-                >
-                  {answer}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+        <Answers
+          answers={QUESTIONS[activeQuestionIndex].answers}
+          selectedAnswers={userAnswers[userAnswers.length - 1]}
+          answerState={answerState}
+          onSelect={handleSelectAnswer}
+        />
       </div>
     </div>
   );
