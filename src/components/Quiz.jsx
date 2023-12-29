@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import QUESTIONS from "../questions";
 import completeImg from "../assets/quiz-complete.png";
 import QuestionTimer from "./QuestionTimer";
@@ -6,6 +6,7 @@ import QuestionTimer from "./QuestionTimer";
 export default function Quiz() {
   const [userAnswers, setUserAnswers] = useState([]);
   const [answerState, setAnswerState] = useState("");
+  const answerShuffled = useRef();
 
   const activeQuestionIndex =
     answerState === "" ? userAnswers.length : userAnswers.length - 1;
@@ -16,7 +17,7 @@ export default function Quiz() {
 
   const handleSelectAnswer = useCallback(
     function handleSelectAnswer(selectedAnswer) {
-      setAnswerState("selected");
+      setAnswerState("answered");
 
       setUserAnswers((prevAnswer) => [...prevAnswer, selectedAnswer]);
 
@@ -53,8 +54,10 @@ export default function Quiz() {
     );
   }
 
-  const answerShuffled = QUESTIONS[activeQuestionIndex].answers;
-  answerShuffled.sort(() => Math.random() - 0.5);
+  if (!answerShuffled.current) {
+    answerShuffled.current = QUESTIONS[activeQuestionIndex].answers;
+    answerShuffled.current.sort(() => Math.random() - 0.5);
+  }
 
   return (
     <div id="quiz">
@@ -66,22 +69,21 @@ export default function Quiz() {
         />
         <h2>{QUESTIONS[activeQuestionIndex].text}</h2>
         <ul id="answers">
-          {answerShuffled.map((answer) => {
-            const answered = userAnswers[userAnswers.length - 1] === answer;
+          {answerShuffled.current.map((answer) => {
+            const isSelected = userAnswers[userAnswers.length - 1] === answer;
             let setClass = "";
 
-            if (answerState === "selected" && answered) {
+            if (answerState === "answered" && isSelected) {
               setClass = "selected";
             }
 
-            if (answerState === "correct" && answered) {
-              setClass = "correct";
-            }
-            if (answerState === "wrong" && answered) {
-              setClass = "wrong";
+            if (
+              (answerState === "wrong" || answerState === "correct") &&
+              isSelected
+            ) {
+              setClass = answerState;
             }
 
-            console.log(answerState);
             return (
               <li key={answer} className="answer">
                 <button
