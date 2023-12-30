@@ -22,6 +22,15 @@ export default function Question({ onSkipAnswer, index, onSelectAnswer }) {
     }, 1000);
   }
 
+  let timer = 10000;
+
+  if (answer.selectedAnswer) {
+    timer = 1000;
+  }
+  if (answer.isCorrect !== null) {
+    timer = 2000;
+  }
+
   if (answer.selectedAnswer && answer.isCorrect != null) {
     answerState = answer.isCorrect ? "correct" : "wrong";
   } else if (answer.selectedAnswer) {
@@ -29,8 +38,13 @@ export default function Question({ onSkipAnswer, index, onSelectAnswer }) {
   }
 
   return (
-    <div className="question">
-      <QuestionTimer timeout="10000" onTimeout={onSkipAnswer} />
+    <div id="question">
+      <QuestionTimer
+        key={timer}
+        timeout={timer}
+        onTimeout={answer.selectedAnswer === "" ? onSkipAnswer : null}
+        mode={answerState}
+      />
       <h2>{QUESTIONS[index].text}</h2>
       <Answers
         index={index}
