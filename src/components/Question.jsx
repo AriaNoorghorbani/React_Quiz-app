@@ -22,7 +22,7 @@ export default function Question({ onSkipAnswer, index, onSelectAnswer }) {
     }, 1000);
   }
 
-  let timer = 10000;
+  let timer = 2000;
 
   if (answer.selectedAnswer) {
     timer = 1000;
